@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 #include "BluetoothSerial.h"
+#include <cstdint>
 
 #define DEBUG_SMA 0
 
