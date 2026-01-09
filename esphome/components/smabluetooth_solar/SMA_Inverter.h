@@ -27,6 +27,8 @@ SOFTWARE.
 */
 
 #include "BluetoothSerial.h"
+#include <Arduino.h>
+#include <BluetoothSerial.h>
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -149,7 +151,7 @@ enum E_RC {
 struct  InverterData {
     uint8_t btAddress[6];
     uint8_t SUSyID;
-    uint32_t Serial;
+    uint32_t SerialNumber;
     uint8_t NetID;
     int32_t Pmax;
     int32_t TotalPac;
