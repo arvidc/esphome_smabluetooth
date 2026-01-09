@@ -43,7 +43,7 @@ void ESP32_SMA_Inverter::setup(std::string mac, std::string pw) {
     strlcpy(smaInvPass , pw.c_str(), sizeof(smaInvPass));
 
     invData.SUSyID = 0x7d;
-    invData.Serial = 0;
+    invData.SerialNumber = 0;
 
     // reverse inverter BT address
     for(uint8_t i=0; i<6; i++) invData.btAddress[i] = smaBTAddress[5-i];
@@ -276,9 +276,9 @@ E_RC ESP32_SMA_Inverter::getInverterDataCfl(uint32_t command, uint32_t first, ui
     pcktID++;
     writePacketHeader(pcktBuf, 0x01, sixff); //addr_unknown);
     //if (invData.SUSyID == SID_SB240)
-    //writePacket(pcktBuf, 0x09, 0xE0, 0, invData.SUSyID, invData.Serial);
+    //writePacket(pcktBuf, 0x09, 0xE0, 0, invData.SUSyID, invData.SerialNumber);
     //else
-    writePacket(pcktBuf, 0x09, 0xA0, 0, invData.SUSyID, invData.Serial);
+    writePacket(pcktBuf, 0x09, 0xA0, 0, invData.SUSyID, invData.SerialNumber);
     write32(pcktBuf, command);
     write32(pcktBuf, first);
     write32(pcktBuf, last);
@@ -310,7 +310,7 @@ E_RC ESP32_SMA_Inverter::getInverterDataCfl(uint32_t command, uint32_t first, ui
         uint16_t rcvpcktID = get_u16(pcktBuf + 27) & 0x7FFF;
         if (pcktID == rcvpcktID) {
           if ((get_u16(pcktBuf + 15) == invData.SUSyID) 
-            && (get_u32(pcktBuf + 17) == invData.Serial)) {
+            && (get_u32(pcktBuf + 17) == invData.SerialNumber)) {
             validPcktID = true;
             value32 = 0;
             value64 = 0;
@@ -564,7 +564,7 @@ E_RC ESP32_SMA_Inverter::getInverterDataCfl(uint32_t command, uint32_t first, ui
             } //for
           } else {
             ESP_LOGW(TAG, "*** Wrong SUSyID=%04x=%04x Serial=%08x=%08x", 
-                 get_u16(pcktBuf + 15), invData.SUSyID, get_u32(pcktBuf + 17),invData.Serial);
+                 get_u16(pcktBuf + 15), invData.SUSyID, get_u32(pcktBuf + 17),invData.SerialNumber);
           }
         } else {  // wrong PacketID
           ESP_LOGW(TAG, "PacketID mismatch: exp=0x%04X is=0x%04X", pcktID, rcvpcktID);
@@ -773,8 +773,8 @@ E_RC ESP32_SMA_Inverter::initialiseSMAConnection() {
   if (!validateChecksum())
     return E_CHKSUM;
 
-  invData.Serial = get_u32(pcktBuf + 57);
-  ESP_LOGW(TAG, "Serial Nr: %lu", invData.Serial);
+  invData.SerialNumber = get_u32(pcktBuf + 57);
+  ESP_LOGW(TAG, "Serial Nr: %lu", invData.SerialNumber);
   return E_OK;
 }
 
@@ -833,8 +833,8 @@ E_RC ESP32_SMA_Inverter::logonSMAInverter(const char *password, const uint8_t us
     uint16_t rcvpcktID = get_u16(pcktBuf+27) & 0x7FFF;
     if ((pcktID == rcvpcktID) && (get_u32(pcktBuf + 41) == now)) {
       invData.SUSyID = get_u16(pcktBuf + 15);
-      invData.Serial = get_u32(pcktBuf + 17);
-      ESP_LOGV(TAG, "Set:->SUSyID=0x%02X ->Serial=0x%02X ", invData.SUSyID, invData.Serial);
+      invData.SerialNumber = get_u32(pcktBuf + 17);
+      ESP_LOGV(TAG, "Set:->SUSyID=0x%02X ->Serial=0x%02X ", invData.SUSyID, invData.SerialNumber);
       validPcktID = true;
       uint8_t retcode = get_u16(pcktBuf + 23);
       // switch (retcode) {
@@ -1043,14 +1043,14 @@ void ESP32_SMA_Inverter::HexDump(uint8_t *buf, int count, int radix, uint8_t c) 
 
 //-----------------------------------------------------
 uint16_t ESP32_SMA_Inverter::get_u16(uint8_t *buf) {
-    register uint16_t shrt = 0;
+    uint16_t shrt = 0;
     shrt += *(buf+1);
     shrt <<= 8;
     shrt += *(buf);
     return shrt;
 }
 uint32_t ESP32_SMA_Inverter::get_u32(uint8_t *buf) {
-    register uint32_t lng = 0;
+    uint32_t lng = 0;
     lng += *(buf+3);
     lng <<= 8;
     lng += *(buf+2);
@@ -1061,7 +1061,7 @@ uint32_t ESP32_SMA_Inverter::get_u32(uint8_t *buf) {
     return lng;
 }
 uint64_t ESP32_SMA_Inverter::get_u64(uint8_t *buf) {
-    register uint64_t lnglng = 0;
+    uint64_t lnglng = 0;
     lnglng += *(buf+7);
     lnglng <<= 8;
     lnglng += *(buf+6);
