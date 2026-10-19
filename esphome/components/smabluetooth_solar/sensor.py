@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, text_sensor, binary_sensor
+from esphome.components import sensor, text_sensor, binary_sensor, esp32
 from esphome.const import (
     CONF_ACTIVE_POWER,
     CONF_CURRENT,
@@ -231,6 +231,8 @@ CONFIG_SCHEMA = (
 
 
 async def to_code(config):
+    esp32.include_builtin_idf_component("bt")
+    
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 #    await modbus.register_modbus_device(var, config)
